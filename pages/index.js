@@ -1,209 +1,177 @@
-import Head from 'next/head'
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import Input from "../components/Input";
+import Header from "../components/navbar/header";
+import { Form, Table, Button, Spinner } from 'react-bootstrap'
+import { useDispatch, useSelector } from "react-redux";
+//import { cleanCategoryDate, getCategoryList, gethanddleSubCategoryData, handleUpdateCategoryData } from "../../src/redux/action/CategoryAction";
+import SimpleModal from "../components/Modal/SimpleModal";
+import Loader from "../components/Loader/Loader";
+
+import { ToastContainer } from "react-toastify";
+import { showToast } from "../components/ToastHelper/ToastHelper";
+import UpdateCategory from "../components/Category/UpdateCategory";
+import { CategorySlice } from "../src/redux/CategorySlice";
+import CustomPagination from "../components/SimplePagination/CustomPagination";
+import AddCategory from "../components/Category/AddCategory";
+import { cleanCategoryDate, getCategoryList, gethanddleSubCategoryData, handleUpdateCategoryData } from "../src/redux/action/CategoryAction";
+const { actions: slice } = CategorySlice;
+
+
+
+export default function Home({ Component, pageProps }) {
+
+  const dispatch = useDispatch();
+  const category = useSelector((state) => state.category.categoryList);
+  const loading = useSelector((state) => state.category.isLoading);
+  const count = useSelector((state) => state.category.categoryCount);
+  const categoryCount = useSelector((state) => state.category);
+  const statusCode = useSelector((state) => state.category.statusCode);
+  const statusMessage = useSelector((state) => state.category.message);
+  const status = useSelector((state) => state.category.status);
+  const [showAddModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [defaultPageData, setDefaultPageData] = useState(100);
+
+  useEffect(() => {
+    dispatch(getCategoryList(defaultPageData))
+  }, [])
+
+  useEffect(() => {
+    if (statusCode !== null && status == true) {
+      showToast("success", `${statusMessage}`);
+
+      dispatch(cleanCategoryDate());
+      dispatch(getCategoryList(defaultPageData));
+    }
+  }, [])
+  const handleUpdate = (item) => {
+    let itemData = {
+      id: item.uid,
+      name: item.name
+    }
+    dispatch(slice.getUpdateCategoryData(itemData));
+    setShowEditModal(true);
+  }
+  const handleAddModale = () => {
+    dispatch(getCategoryList(defaultPageData))
+    dispatch(cleanCategoryDate());
+    setShowModal(true);
+  }
+  const handlePage = (page) => {
+    setDefaultPageData(page);
+    dispatch(getCategoryList(page))
+  }
+
+
+
+
+
   return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <>
+      <div className="mainContainer">
+        <Header />
+        <div className="container">
+          <div className="card card-custom gutter-b pl-5 pr-5 mb-5 card-top-border mt-5">
+            <div className="layout">
+              <div className="mb-2">
+                <Button variant="outline-primary" onClick={() => handleAddModale()}>Add Category</Button>
+              </div>
+              {loading && <Loader />}
+              <div className="react-bootstrap-table table-responsive border-0 pl-5 ">
+                <Table className="table table-head-custom table-vertical-center  item-add-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>ID</th>
+                      <th>Category Name</th>
+                      {/* <th>Parents category  Name</th> */}
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
 
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+                    {
+                      category?.length > 0
+                      && category.map((item, index) => (
+                        <>
+                          <tr>
+                            <td>{++index}</td>
+                            <td>{item.uid}</td>
+                            <td>{item.name}</td>
+                          
+                          
+                           
+                            <td>
+                              <Button variant="outline-success" size="sm" onClick={() => handleUpdate(item)}>
+                                Edit
 
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
+                              </Button>
+                            </td>
+                           
+                          </tr>
+                         
+                            {/* {
+                              item?.parents.map((child,childIndex)=>(
+                                <tr>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{child.name =='undefined'?'No category':child.name}</td>
+                                
+                                </tr>
+                              ))
+                            } */}
+                            
+                         
+                        </>
+                      ))
+                    }
+                  </tbody>
+                </Table>
+              </div>
 
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
 
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+              <CustomPagination
+                data={category}
+                itemsPerPage={5}
+                count={count}
+                handlePageInfo={handlePage}
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+
+              />
+            </div>
+          </div>
         </div>
-      </main>
 
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <SimpleModal
+          size="md"
+          show={showAddModal}
+          handleClose={() => setShowModal(false)}
+          handleShow={() => setShowModal(true)}
+          modalTitle={"Add Category"}
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel" className="logo" />
-        </a>
-      </footer>
 
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+          <AddCategory
+            handleClose={() => setShowModal(false)}
+          />
+        </SimpleModal>
+        <SimpleModal
+          size="md"
+          show={showEditModal}
+          handleClose={() => setShowEditModal(false)}
+          handleShow={() => setShowEditModal(true)}
+          modalTitle={"Update Category"}
+        >
 
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+          <UpdateCategory
+            handleClose={() => setShowModal(false)}
+          />
+        </SimpleModal>
+      </div>
 
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
+    </>
   )
-}
+} 
