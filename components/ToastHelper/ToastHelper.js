@@ -20,7 +20,6 @@ export const showToast = (
   className = "primaryColor",
   position = defaultPosition
 ) => {
-    console.log('type', type);
   if (type === "success") {
     toast.success(msg, {
       autoClose: autoClose === null ? 2000 : autoClose,

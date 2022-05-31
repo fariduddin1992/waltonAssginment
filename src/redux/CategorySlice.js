@@ -32,7 +32,6 @@ export const CategorySlice = createSlice({
             state.categoryCount=action.payload.data.count
         },
         getSubCategoryList: (state, action) => {
-            console.log('action subcae', action);
             state.isLoading=action.payload.isLoading
             state.subCateList = action.payload.data.categories
             state.categoryCount=action.payload.data.count
@@ -48,6 +47,10 @@ export const CategorySlice = createSlice({
             cloneObj.category=action.payload.name;
             cloneObj.catId=action.payload.id;
             state.inputData=cloneObj; 
+        },
+        updateCategory: (state, action) => {
+            const elementIndex = state.categoryList.findIndex((obj => obj.uid == action.payload.categorySet.catId));
+            state.categoryList[elementIndex].name = action.payload.categorySet.category;
         },
         cleanData: (state, action) => {
             state.statusCode="";

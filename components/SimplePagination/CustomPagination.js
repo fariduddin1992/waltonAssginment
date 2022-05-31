@@ -3,13 +3,12 @@ import ReactPaginate from 'react-paginate';
 
 const CustomPagination = (props) => {
 
-    console.log('props', props);
+ 
 
     const { data, itemsPerPage,count } = props;
 
 
     const [pageCount, setPageCount] = useState(0);
-    console.log('data', count);
     useEffect(() => {
         // Fetch items from another resources.
         const endOffset = data + itemsPerPage;

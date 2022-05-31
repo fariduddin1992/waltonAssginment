@@ -21,9 +21,6 @@ export const authSlice = createSlice({
             state.data = ""
         },
         setData: (state, action) => {
-            alert();
-            console.log('action', action);
-            console.log('state', state);
             state.data = action.payload
         }
     }

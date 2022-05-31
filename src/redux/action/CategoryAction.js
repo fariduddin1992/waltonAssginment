@@ -16,7 +16,7 @@ export const categorySubmit = createAsyncThunk('categoryAdd', async (dataSet, { 
     data: {},
     status: true,
   };
-  console.log('dataSet', dataSet);
+ 
 
   await Axios({
     url: 'https://devapiv2.walcart.com/graphql',
@@ -70,6 +70,7 @@ export const handleUpdateCategoryData = createAsyncThunk('categoryUpdate', async
     isLoading: true,
     data: {},
     status: true,
+    categorySet:dataSet
   };
 
   try {
@@ -113,13 +114,13 @@ export const handleUpdateCategoryData = createAsyncThunk('categoryUpdate', async
     responseList.data = results.data.data.updateCategory;
     showToast("success", `${results.data.data.updateCategory.message}`);
   }).catch((e) => {
-    console.log('e', e);
+    console.log('es', e);
   })
   } catch (error) {
     
   }
   
-  dispatch(slice.submitCategory(responseList));
+  dispatch(slice.updateCategory(responseList));
 
 })
 
@@ -131,7 +132,9 @@ export const getCategoryList = createAsyncThunk('category', async (skip, { dispa
   };
   
   dispatch(slice.getCategoryData(responseList))
-  await Axios({
+
+  try {
+    await Axios({
     url: 'https://devapiv2.walcart.com/graphql',
     method: 'post',
     data: {
@@ -167,11 +170,16 @@ export const getCategoryList = createAsyncThunk('category', async (skip, { dispa
           `
     }
   }).then((results) => {
-    console.log('results', results);
-    console.log("categroy", results.data.data.getCategories.result)
+    
     responseList.data = results.data.data.getCategories.result == null ? [] : results.data.data.getCategories.result;
-    responseList.isLoading = false
-  });
+    responseList.isLoading = false;
+  }).catch(()=>{
+     responseList.isLoading = false;
+  })
+  } catch (error) {
+    responseList.isLoading = false;
+  }
+  
   dispatch(slice.getCategoryData(responseList))
 })
 export const gethanddleSubCategoryData = createAsyncThunk('subcate', async (skip, { dispatch }) => {
@@ -217,8 +225,7 @@ export const gethanddleSubCategoryData = createAsyncThunk('subcate', async (skip
           `
       }
     }).then((results) => {
-      console.log('sub result', results);
-      console.log("sub result", results.data.data.getCategories.result)
+  
       responseList.data = results.data.data.getCategories.result == null ? [] : results.data.data.getCategories.result;
       responseList.isLoading = false
     });

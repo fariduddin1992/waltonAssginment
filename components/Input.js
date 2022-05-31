@@ -2,7 +2,7 @@
 import { Form } from 'react-bootstrap'
 
 const Input = (props) => {
-    console.log('props', props);
+
     let label = props.label == undefined || props.label ? true : false;
     return (
         <>

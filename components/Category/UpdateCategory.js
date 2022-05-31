@@ -15,6 +15,8 @@ import Select from "react-select";
 
 const UpdateCategory = (props) => {
 
+
+    console.log('props', props);
     const { register, handleSubmit, errors, setValue, setFocus } = useForm();
     const dispatch = useDispatch();
     const input = useSelector((state) => state.category.inputData);

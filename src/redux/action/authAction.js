@@ -82,7 +82,7 @@ export const getDataAction = createAsyncThunk('post/getPost',async(obj,{dispatch
         `
     }
   }).then((results) => {
-    console.log(results.data.data.getCategories.result.categories)
+    
     dispatch(slice.setData(results.data.data.getCategories.result.categories))
   });
 

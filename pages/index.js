@@ -35,7 +35,7 @@ export default function Home({ Component, pageProps }) {
 
   useEffect(() => {
     dispatch(getCategoryList(defaultPageData))
-  }, [])
+  }, [showAddModal])
 
   useEffect(() => {
     if (statusCode !== null && status == true) {
@@ -45,6 +45,7 @@ export default function Home({ Component, pageProps }) {
       dispatch(getCategoryList(defaultPageData));
     }
   }, [])
+
   const handleUpdate = (item) => {
     let itemData = {
       id: item.uid,
@@ -53,18 +54,15 @@ export default function Home({ Component, pageProps }) {
     dispatch(slice.getUpdateCategoryData(itemData));
     setShowEditModal(true);
   }
+
   const handleAddModale = () => {
-    dispatch(getCategoryList(defaultPageData))
-    dispatch(cleanCategoryDate());
     setShowModal(true);
+    dispatch(cleanCategoryDate());
   }
   const handlePage = (page) => {
     setDefaultPageData(page);
     dispatch(getCategoryList(page))
   }
-
-
-
 
 
   return (
@@ -99,19 +97,21 @@ export default function Home({ Component, pageProps }) {
                             <td>{++index}</td>
                             <td>{item.uid}</td>
                             <td>{item.name}</td>
-                          
-                          
-                           
+
                             <td>
                               <Button variant="outline-success" size="sm" onClick={() => handleUpdate(item)}>
                                 Edit
 
                               </Button>
                             </td>
-                           
+
                           </tr>
-                         
-                            {/* {
+                          {/**
+                           * 
+                           * For child category list
+                           */}
+
+                          {/* {
                               item?.parents.map((child,childIndex)=>(
                                 <tr>
                                   <td></td>
@@ -122,8 +122,8 @@ export default function Home({ Component, pageProps }) {
                                 </tr>
                               ))
                             } */}
-                            
-                         
+
+
                         </>
                       ))
                     }
@@ -132,20 +132,22 @@ export default function Home({ Component, pageProps }) {
               </div>
 
 
-
+              {/**
+               * Paginatin
+               */}
               <CustomPagination
                 data={category}
                 itemsPerPage={5}
                 count={count}
                 handlePageInfo={handlePage}
-
-
               />
             </div>
           </div>
         </div>
 
-
+        {/**
+               * For add MOdal
+               */}
         <SimpleModal
           size="md"
           show={showAddModal}
@@ -153,11 +155,13 @@ export default function Home({ Component, pageProps }) {
           handleShow={() => setShowModal(true)}
           modalTitle={"Add Category"}
         >
-
           <AddCategory
             handleClose={() => setShowModal(false)}
           />
         </SimpleModal>
+        {/**
+          * For Update MOdal
+        */}
         <SimpleModal
           size="md"
           show={showEditModal}
@@ -165,9 +169,8 @@ export default function Home({ Component, pageProps }) {
           handleShow={() => setShowEditModal(true)}
           modalTitle={"Update Category"}
         >
-
           <UpdateCategory
-            handleClose={() => setShowModal(false)}
+            handleClose={() => setShowEditModal(false)}
           />
         </SimpleModal>
       </div>
